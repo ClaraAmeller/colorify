@@ -1,0 +1,57 @@
+/*#canvas-background {
+    position: absolute;
+    top: 0;
+    left 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}*/
+
+.container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+#colors-left {
+    width: 25%;
+    height: 200px;
+    display: flex;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.colors-left-container {
+    width: 80%;
+    height: 80px;
+    margin: 15px;
+}
+
+#colors-board {
+    width: 80%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 100px auto;
+}
+
+.color-container, .colors-left-container {
+    width: 30%;
+    display: flex;
+    height: 4rem;
+    margin: 5px;
+    border: 1px solid grey;
+    border-radius: 5px;
+}
+
+.color {
+    width: 80px;
+    height: 4rem;
+    margin: 5px;
+}
+
+.ui-draggable-dragging {
+    border: 1px solid red;
+}

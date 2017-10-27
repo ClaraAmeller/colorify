@@ -1,0 +1,83 @@
+
+// var level1 = [
+//     [   {'hex': '#f8f9fa', 'pos': 1},
+//         {'hex': '#dfe0e1', 'pos': 2},
+//         {'hex': '#c6c7c8', 'pos': 3},
+//         {'hex': '#adaeaf', 'pos': 4},
+//         {'hex': '#949596', 'pos': 5},
+//         {'hex': '#7c7c7d', 'pos': 6},
+//         {'hex': '#636364', 'pos': 7},
+//         {'hex': '#4a4a4b', 'pos': 8},
+//         {'hex': '#313132', 'pos': 9},
+//         {'hex': '#181819', 'pos': 10},
+//         {'hex': '#000000', 'pos': 11}
+//     ],
+//
+//     [   {'hex': '#f8f9fa', 'pos': 1},
+//         {'hex': '#dfe0e1', 'pos': 2},
+//         {'hex': '#c6c7c8', 'pos': 3},
+//         {'hex': '#adaeaf', 'pos': 4},
+//         {'hex': '#949596', 'pos': 5},
+//         {'hex': '#7c7c7d', 'pos': 6},
+//         {'hex': '#636364', 'pos': 7},
+//         {'hex': '#4a4a4b', 'pos': 8},
+//         {'hex': '#313132', 'pos': 9},
+//         {'hex': '#181819', 'pos': 10},
+//         {'hex': '#000000', 'pos': 11}
+//     ]
+//
+// ];
+//
+// var colors = [
+//     {'hex': '#f8f9fa', 'pos': 1},
+//     {'hex': '#dfe0e1', 'pos': 2},
+//     {'hex': '#c6c7c8', 'pos': 3},
+//     {'hex': '#adaeaf', 'pos': 4},
+//     {'hex': '#949596', 'pos': 5},
+//     {'hex': '#7c7c7d', 'pos': 6},
+//     {'hex': '#636364', 'pos': 7},
+//     {'hex': '#4a4a4b', 'pos': 8},
+//     {'hex': '#313132', 'pos': 9},
+//     {'hex': '#181819', 'pos': 10},
+//     {'hex': '#000000', 'pos': 11},
+// ];
+
+// var pastel = [
+//     "#ffcccc", "#ffe0cc", "#ffeacc", "#fff4cc", "#fffecc",
+//     "#effac8", "#c7f5c4", "#c4f0f4", "#c4daf4", "#c9c4f4",
+//     "#e1c4f4", "#f6c6e6"];
+//
+// var rainbow = [
+//     "#fbb735", "#e98931", "#eb403b", "#b32E37", "#6c2a6a",
+//     "#5c4399", "#274389", "#1f5ea8", "#227FB0", "#2ab0c5",
+//     "#39c0b3"
+// ];
+//
+// var diff = [
+//         https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Colors/Color_picker_tool
+//
+// ];
+
+// function shuffleColors(array) {
+//     var n = array.length, t, i;
+//
+//     while (n) {
+//         i = Math.floor(Math.random() * n--);
+//         t = array[n];
+//         array[n] = array[i];
+//         array[i] = t;
+//     }
+//
+//     return array;
+// }
+// for (var i in shuffleColors(colors)) {
+//     var color_container = $('<div class="color-container"></div>');
+//     var color = $('<div class="color" position="' + colors[i].pos + '"></div>');
+//     $(color).css('background-color', colors[i].hex).draggable();
+//     $(color_container).droppable({
+//         drop: handleDropEvent,
+//         over:handleDropEvent
+//     });
+//     board.append(color_container);
+//     color_container.append(color);
+// }
