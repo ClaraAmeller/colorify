@@ -1,88 +1,116 @@
 'use strict';
 
-function generateRandomColors() {
-    var colors = [];
-    var color_palette = Math.floor(Math.random() * 359);
-    var color;
-    for (var i = 0; i < 11; i++) {
-        color = {'hsl': 'hsl(' + color_palette + ', 100%, '+  Math.floor(Math.random() * (95 - 25 + 1) + 25) + '%)'}; // Last parameter: the greater, the clearer
-        if (!colors.includes(color)) {
-            colors.push(color);
-        }
-    }
+// --- Object declaration
+function Game() {
+    this.state = "Landing";
+    this.colors = generateRandomColors();
+    this.sortedColors = sortColors(this.colors);
+    this.startingColor = this.sortedColors[this.sortedColors.length -1]; // The darkest one
+    this.level = null;
+    this.timeRemaining = null;
+    this.userSelection = null;
+    this.result = result();
 
-    return colors;
-}
-
-function sortColors(object) {
-    var array = [];
-    for (var i in object) {
-        array.push(object[i].hsl);
-    }
-
-    return array.sort().reverse(); // Clears to darkers
-}
-
-function result() {
-    var color_containers = $('.color-container');
-    console.log($(color_containers).is(':empty'));
-}
-
-function canvasBackground() {
-    var granim = new Granim({
-        element: '#canvas-background',
-        name: 'background-animation',
-        direction: 'left-right',
-        opacity: [1, 1],
-        isPausedWhenNotInView: true,
-        states: {
-            "default-state": {
-                gradients: [
-                    ['#e74c3c', '#ffffff'],
-                    ['#ffffff', '#e74c3c']
-                ]
+    function generateRandomColors() {
+        var colors = [];
+        var color_palette = Math.floor(Math.random() * 359);
+        var color;
+        for (var i = 0; i < 11; i++) {
+            color = {'hsl': 'hsl(' + color_palette + ', 100%, '+  Math.floor(Math.random() * (95 - 25 + 1) + 25) + '%)'}; // Last parameter: the greater, the clearer
+            if (!colors.includes(color)) {
+                colors.push(color);
             }
         }
+
+        return colors;
+    }
+
+    function sortColors(object) {
+        var array = [];
+        for (var i in object) {
+            array.push(object[i].hsl);
+        }
+
+        return array.sort().reverse(); // Clears to darkers
+    }
+
+    function result() {
+        // var color_containers = $('.color-container');
+        // console.log($(color_containers).is(':empty'));
+        //
+        // return (color_containers).is(':empty');
+
+        // var completed = true;
+        //
+        // var c = $('.color-container').each(function() {
+        //     console.log($(this).children().length);
+        // });
+        //
+        // return c;
+
+        // var completed = true;
+        // $('.color-container').each(function() {
+        //     if (($(this).children().length) <= 0) {
+        //         completed = false;
+        //     }
+        // });
+        //
+        // console.log(completed);
+        console.log("asdf");
+
+    }
+}
+
+// --- Instance of object
+var game = new Game();
+
+
+// --- Build landing page
+function buildLanding() {
+    var welcome_container = $('<div class="welcome-container"></div>');
+    var html = `
+        <div class="brand">
+            <h1>Colorify</h1>
+        </div>
+        <div class="level-buttons">
+            <button class="level-one">Level 1</button>
+            <button class="level-two">Level 2</button>
+            <button class="level-three">Level 3</button>
+        </div>
+    `;
+    $('.container').append(welcome_container);
+    welcome_container.html(html);
+
+    // --- Click on level button
+    $('.level-buttons button').on('click', function() {
+        buildGamingScreen("Level 1");
     });
 }
 
-// --- Drag and drop
-//
-// function handleDragStop(event, ui) {
-//     var offsetX = parseInt(ui.offset.left);
-//     var offsetY = parseInt(ui.offset.top);
-//     console.log(offsetX + " " + offsetY);
-// }
+// --- Build gaming screen
+function buildGamingScreen(level) {
+    $('.welcome-container').remove(); // Reset
+    var game_container = $('<div class="game-container"></div>');
+    $(game_container).html('<div id="colors-left"></div><div id="colors-board"></div>');
+    $('.container').append(game_container);
 
-// function hangleDragStart(event, ui) {
-//     var offsetX = parseInt(ui.offset.left);
-//     var offsetY = parseInt(ui.offset.top);
-//     var element = document.elementFromPoint(offsetX, offsetY);
-//     $(element).css('border', '2px solid pink');
-// }
-
-function handleDropEvent(event, ui) {
-    // var draggable = ui.draggable;
-    $(this).css('border', '5px solid yellow');
-}
-
-function main() {
     var colors_left = $('#colors-left');
     var board = $('#colors-board');
+    game.state = level;
 
-    var colors = generateRandomColors();
-    for (var j in colors) {
+    for (var i = 0; i < game.colors.length; i++) {
         var colors_left_container = $('<div class="colors-left-container"></div>');
         var color_container = $('<div class="color-container"></div>');
-        var color = $('<div class="color"></div>');
-        $(colors_left_container).css('background-color', colors[j].hsl);
 
-        colors_left.append(colors_left_container);
-        colors_left_container.append(color);
-        board.append(color_container);
+        if (game.colors[i].hsl != game.startingColor) {
+            $(colors_left_container).css('background-color', game.colors[i].hsl);
+            colors_left.append(colors_left_container);
+            board.append(color_container);
+        }
 
         $(colors_left_container).draggable({
             cursor: 'move',
+            snap: '#colors-board .color-container',
             // containment: '#colors-board',
             // drag: hangleDragStart,
             // stop: handleDragStop
@@ -90,21 +118,27 @@ function main() {
 
         $(color_container).droppable({
             drop: handleDropEvent,
-            over: handleDropEvent
         });
     }
 
-    var sortedColors = sortColors(colors);
-    console.log(sortedColors);
-    $('.color-container').last().css('background-color', sortedColors[sortedColors.length -1]);
-    // $('.color-container').first().css('background-color', sortedColors[0]);
+    board.append($('<div class="color-container"></div>').css('background-color', game.startingColor));
+    $('.game-container').show(); // Reset
 
 }
 
+// --- Drag & drop
+function handleDropEvent(event, ui, moves) {
+    var draggable = ui.draggable;
+    var bg_color = draggable.css('backgroundColor');
+    var aux = $('<div class="' + bg_color + '"></div>').css({'background-color': 'bg_color', 'display': 'none'});
+    aux.appendTo($(this));
+    moves++;
+    console.log("moves: " + moves);
+
+
+    // $(this).css('border', '5px solid yellow');
+}
 
 $(document).ready(function () {
-    if ($('#canvas-background').length) {
-        canvasBackground();
-    }
-    main();
+    buildLanding();
 });

@@ -81,3 +81,48 @@
 //     board.append(color_container);
 //     color_container.append(color);
 // }
+
+// function canvasBackground() {
+//     var granim = new Granim({
+//         element: '#canvas-background',
+//         name: 'background-animation',
+//         direction: 'left-right',
+//         opacity: [1, 1],
+//         isPausedWhenNotInView: true,
+//         states: {
+//             "default-state": {
+//                 gradients: [
+//                     ['#e74c3c', '#ffffff'],
+//                     ['#ffffff', '#e74c3c']
+//                 ]
+//             }
+//         }
+//     });
+// }
+
+// --- Drag and drop
+//
+// function handleDragStop(event, ui) {
+//     var offsetX = parseInt(ui.offset.left);
+//     var offsetY = parseInt(ui.offset.top);
+//     console.log(offsetX + " " + offsetY);
+// }
+
+// function hangleDragStart(event, ui) {
+//     var offsetX = parseInt(ui.offset.left);
+//     var offsetY = parseInt(ui.offset.top);
+//     var element = document.elementFromPoint(offsetX, offsetY);
+//     $(element).css('border', '2px solid pink');
+// }
+
+
+
+        // $('.color-container').sortable({containment: 'document', tolerance: 'pointer', cursor: 'pointer',
+        //     revert: 'true', opacity: 0.6, connectWith: '#colors-left',
+        //     items: '.colors-left-container'
+        // });
+
+        // $('.colors-continer').sortable();
+        // $('.colors-continer').disableSelection();
+        // $('#colors-left').sortable();
+        // $('#colors-left').disableSelection();
