@@ -9,7 +9,8 @@ function Game() {
     this.level = null;
     this.timeRemaining = null;
     this.userSelection = null;
-    this.result = result();
+    // this.result = checkResult();
+    this.moves = 0;
 
     function generateRandomColors() {
         var colors = [];
@@ -33,37 +34,19 @@ function Game() {
 
         return array.sort().reverse(); // Clears to darkers
     }
+}
 
-    function result() {
-        // var color_containers = $('.color-container');
-        // console.log($(color_containers).is(':empty'));
-        //
-        // return (color_containers).is(':empty');
 
-        // var completed = true;
-        //
-        // var c = $('.color-container').each(function() {
-        //     console.log($(this).children().length);
-        // });
-        //
-        // return c;
-
-        // var completed = true;
-        // $('.color-container').each(function() {
-        //     if (($(this).children().length) <= 0) {
-        //         completed = false;
-        //     }
-        // });
-        //
-        // console.log(completed);
-        console.log("asdf");
-
-    }
+function checkResult() {
+    var user_sort = [];
+    $('.color-container').children().each(function() {
+        user_sort.push($(this).attr('class'));
+    });
+    return user_sort;
 }
 
 // --- Instance of object
 var game = new Game();
-
 
 // --- Build landing page
 function buildLanding() {
@@ -127,14 +110,21 @@ function buildGamingScreen(level) {
 }
 
 // --- Drag & drop
-function handleDropEvent(event, ui, moves) {
+function handleDropEvent(event, ui) {
     var draggable = ui.draggable;
     var bg_color = draggable.css('backgroundColor');
     var aux = $('<div class="' + bg_color + '"></div>').css({'background-color': 'bg_color', 'display': 'none'});
     aux.appendTo($(this));
-    moves++;
-    console.log("moves: " + moves);
 
+    if ($('.color-container').has('div').length === 10) {
+        // if (game.result) {
+        //     console.log("Winner");
+        // } else {
+        //     console.log("Loser");
+        // }
+
+        console.log(checkResult());
+    }
 
     // $(this).css('border', '5px solid yellow');
 }
