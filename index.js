@@ -15,17 +15,31 @@ function Game() {
         var colors = [];
         var color_palette = Math.floor(Math.random() * 359);
         var color;
-        for (var i = 0; i < 11; i++) { // CHANGE: While colors.length < 11
+        for (var i = 0; colors.length < 11; i++) { // CHANGE: While colors.length < 11
             color = {
-                'hsl': 'hsl(' + color_palette + ', 100%, ' + Math.floor(Math.random() * (95 - 25 + 2) + 25) + '%)'
+                'hsl': 'hsl(' + color_palette + ', 100%, ' + Math.floor(Math.random() * (95 - 25 + 7) + 25) + '%)'
             }; // Last parameter: the greater, the clearer
-            if (colors.includes(color.hsl) === false) {
+
+            var found = false;
+            for (var j = 0; j < colors.length && !found; j++) {
+                if(objectEquals(colors[j], color)) {
+                    found = true;
+                }
+            }
+            if (!found) {
                 colors.push(color);
             }
         }
+        console.log(colors);
         return colors;
     }
 }
+
+function objectEquals(obj1, obj2) {
+    return obj1.hsl == obj2.hsl;
+}
+
+var game;
 
 // --- Methods
 function sortColors(object) {
@@ -44,11 +58,10 @@ function checkResult() {
         user_sort.push($(this).attr('class'));
     });
     user_sort = utilsRgbToHsl(user_sort);
-    user_sort = utilsRemoveDuplicates(user_sort);
     console.log("User");
     console.log(user_sort);
     console.log("Game");
-    console.log(game.sortedColors);
+    console.log(game);
 
     var winner = true;
     for (var i = 0; i < game.sortedColors.length - 1; i++) {
@@ -57,7 +70,11 @@ function checkResult() {
         }
     }
 
-    $('#colors-left').css('background-image', 'url(../confetti.gif)');
+    if (winner) {
+        $('#colors-left').css('background-image', 'url(../confetti.gif)');
+    } else {
+        @// TODO: loser gif
+    }
 }
 
 // --- Utils
@@ -71,17 +88,14 @@ function utilsRemoveDuplicates(array) {
 
 function utilsRgbToHslAlgorithm(r, g, b) {
     r /= 255, g /= 255, b /= 255;
-
     var max = Math.max(r, g, b),
         min = Math.min(r, g, b);
     var h, s, l = (max + min) / 2;
-
     if (max == min) {
         h = s = 0; // achromatic
     } else {
         var d = max - min;
         s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-
         switch (max) {
             case r:
                 h = (g - b) / d + (g < b ? 6 : 0);
@@ -93,10 +107,8 @@ function utilsRgbToHslAlgorithm(r, g, b) {
                 h = (r - g) / d + 4;
                 break;
         }
-
         h /= 6;
     }
-
     return [h, s, l];
 }
 
@@ -156,15 +168,26 @@ function buildLanding() {
 
     // --- Click on level button
     $('.level-buttons button').on('click', function() {
-        buildGamingScreen("Level 1", false);
+        createGamingScreen();
     });
 }
 
-// --- Build gaming screen
-function buildGamingScreen(level) {
+// --- Create gaming screen
+function createGamingScreen() {
     // --- Instance of object
-    var game = new Game();
-    // game.colors = generateRandomColors();
+    game = new Game();
+    buildGamingScreen(game);
+
+}
+
+// --- Reset gaming screen
+function resetGamingScreen(game) {
+    $('.game-container').remove(); // Reset
+    buildGamingScreen(game);
+}
+
+// --- Build gaming screen
+function buildGamingScreen(game) {
     // --- Build screen
     $('.welcome-container').remove(); // Reset
     var game_container = $('<div class="game-container"></div>');
@@ -186,7 +209,7 @@ function buildGamingScreen(level) {
 
     var colors_left = $('#colors-left');
     var board = $('#colors-board');
-    game.state = level;
+    // game.state = level;
 
     for (var i = 0; i < game.colors.length; i++) {
         var colors_left_container = $('<div class="colors-left-container"></div>');
@@ -227,15 +250,16 @@ function buildGamingScreen(level) {
 
     $('.btn-next').on('click', function() {
         $('.game-container').remove(); // Reset
-        buildGamingScreen("Level 1");
+        createGamingScreen();
     });
 
     $('.btn-reset').on('click', function() {
-        // buildGamingScreen("Level 1", true);
+        resetGamingScreen(game);
         clock.stop();
         clock.reset();
         clock.start();
     });
+
 }
 
 // --- Drag & drop
