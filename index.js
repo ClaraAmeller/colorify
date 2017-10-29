@@ -2,10 +2,10 @@
 
 // --- Object declaration
 function Game() {
-    this.state = "Landing";
+    this.state = null;
     this.colors = generateRandomColors();
     this.sortedColors = sortColors(this.colors);
-    this.startingColor = this.sortedColors[this.sortedColors.length -1]; // The darkest one
+    this.startingColor = this.sortedColors[this.sortedColors.length - 1]; // The darkest one
     this.level = null;
     this.timeRemaining = null;
     this.userSelection = null;
@@ -16,7 +16,9 @@ function Game() {
         var color_palette = Math.floor(Math.random() * 359);
         var color;
         for (var i = 0; i < 11; i++) { // CHANGE: While colors.length < 11
-            color = {'hsl': 'hsl(' + color_palette + ', 100%, '+  Math.floor(Math.random() * (95 - 25 + 2) + 25) + '%)'}; // Last parameter: the greater, the clearer
+            color = {
+                'hsl': 'hsl(' + color_palette + ', 100%, ' + Math.floor(Math.random() * (95 - 25 + 2) + 25) + '%)'
+            }; // Last parameter: the greater, the clearer
             if (colors.includes(color.hsl) === false) {
                 colors.push(color);
             }
@@ -60,27 +62,34 @@ function utilsRemoveDuplicates(array) {
 // }
 
 function utilsRgbToHslAlgorithm(r, g, b) {
-  r /= 255, g /= 255, b /= 255;
+    r /= 255, g /= 255, b /= 255;
 
-  var max = Math.max(r, g, b), min = Math.min(r, g, b);
-  var h, s, l = (max + min) / 2;
+    var max = Math.max(r, g, b),
+        min = Math.min(r, g, b);
+    var h, s, l = (max + min) / 2;
 
-  if (max == min) {
-    h = s = 0; // achromatic
-  } else {
-    var d = max - min;
-    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    if (max == min) {
+        h = s = 0; // achromatic
+    } else {
+        var d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
 
-    switch (max) {
-      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-      case g: h = (b - r) / d + 2; break;
-      case b: h = (r - g) / d + 4; break;
+        switch (max) {
+            case r:
+                h = (g - b) / d + (g < b ? 6 : 0);
+                break;
+            case g:
+                h = (b - r) / d + 2;
+                break;
+            case b:
+                h = (r - g) / d + 4;
+                break;
+        }
+
+        h /= 6;
     }
 
-    h /= 6;
-  }
-
-  return [ h, s, l ];
+    return [h, s, l];
 }
 
 function utilsRgbToHsl(array) {
@@ -119,13 +128,13 @@ function checkResult() {
     console.log(game.sortedColors);
 
     var winner = true;
-    for (var i = 0; i < game.sortedColors.length -1; i++) {
+    for (var i = 0; i < game.sortedColors.length - 1; i++) {
         if (user_sort[i] !== game.sortedColors[i]) {
             winner = false;
         }
     }
 
-    console.log(winner);
+    $('#colors-left').css('background-image', 'url(../confetti.gif)');
 }
 
 // --- Build landing page
@@ -159,13 +168,13 @@ function buildLanding() {
         opacity: [1, 1],
         stateTransitionSpeed: 5000,
         isPausedWhenNotInView: true,
-        states : {
-          "default-state": {
-              gradients: [
-                  ['#ff9966', '#ff5e62'],
-                  ['#ff5e62', '#ff9966']
-              ]
-          },
+        states: {
+            "default-state": {
+                gradients: [
+                    ['#ff9966', '#ff5e62'],
+                    ['#ff5e62', '#ff9966']
+                ]
+            },
         },
     });
 
@@ -175,11 +184,13 @@ function buildLanding() {
     });
 }
 
+
+
 // --- Build gaming screen
-function buildGamingScreen(level, reset) {
+function buildGamingScreen(level) {
     // --- Instance of object
     var game = new Game();
-
+    // game.colors = generateRandomColors();
     // --- Build screen
     $('.welcome-container').remove(); // Reset
     var game_container = $('<div class="game-container"></div>');
@@ -242,7 +253,7 @@ function buildGamingScreen(level, reset) {
 
     $('.btn-next').on('click', function() {
         $('.game-container').remove(); // Reset
-        buildGamingScreen("Level 1", false);
+        buildGamingScreen("Level 1");
     });
 
     $('.btn-reset').on('click', function() {
@@ -259,7 +270,10 @@ function buildGamingScreen(level, reset) {
 function handleDropEvent(event, ui) {
     var draggable = ui.draggable;
     var bg_color = draggable.css('backgroundColor');
-    var aux = $('<div class="' + bg_color + '"></div>').css({'background': 'bg_color', 'display': 'none'});
+    var aux = $('<div class="' + bg_color + '"></div>').css({
+        'background': 'bg_color',
+        'display': 'none'
+    });
     aux.appendTo($(this));
 
     if ($('.color-container').has('div').length === 10) { // All colors completed
@@ -270,6 +284,6 @@ function handleDropEvent(event, ui) {
     // $(this).css('border', '5px solid yellow');
 }
 
-$(document).ready(function () {
+$(document).ready(function() {
     buildLanding();
 });

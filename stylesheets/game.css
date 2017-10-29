@@ -89,8 +89,8 @@ html, body, .container, .welcome-container, .game-container {
 .brand {
     color: white;
     font-family: 'Oswald';
-    font-size: 80px;
-    margin: 5% 20% auto auto;
+    font-size: 190px;
+    margin: 10% 20% auto auto;
 }
 
 .level-buttons {
