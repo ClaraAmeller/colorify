@@ -9,72 +9,194 @@ function Game() {
     this.level = null;
     this.timeRemaining = null;
     this.userSelection = null;
-    // this.result = checkResult();
     this.moves = 0;
 
     function generateRandomColors() {
         var colors = [];
         var color_palette = Math.floor(Math.random() * 359);
         var color;
-        for (var i = 0; i < 11; i++) {
-            color = {'hsl': 'hsl(' + color_palette + ', 100%, '+  Math.floor(Math.random() * (95 - 25 + 1) + 25) + '%)'}; // Last parameter: the greater, the clearer
-            if (!colors.includes(color)) {
+        for (var i = 0; i < 11; i++) { // CHANGE: While colors.length < 11
+            color = {'hsl': 'hsl(' + color_palette + ', 100%, '+  Math.floor(Math.random() * (95 - 25 + 2) + 25) + '%)'}; // Last parameter: the greater, the clearer
+            if (colors.includes(color.hsl) === false) {
                 colors.push(color);
             }
         }
-
         return colors;
-    }
-
-    function sortColors(object) {
-        var array = [];
-        for (var i in object) {
-            array.push(object[i].hsl);
-        }
-
-        return array.sort().reverse(); // Clears to darkers
     }
 }
 
+// --- Utils
+function utilsRemoveDuplicates(array) {
+    array.filter(function(item, index, self) {
+        return self.indexOf(item) == index;
+    });
 
+    return array;
+}
+
+// function utilsHslToRgbAlgorithm(h, s, l){
+//     var r, g, b;
+//
+//     if(s == 0){
+//         r = g = b = l; // achromatic
+//     }else{
+//         var hue2rgb = function hue2rgb(p, q, t){
+//             if(t < 0) t += 1;
+//             if(t > 1) t -= 1;
+//             if(t < 1/6) return p + (q - p) * 6 * t;
+//             if(t < 1/2) return q;
+//             if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+//             return p;
+//         }
+//
+//         var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+//         var p = 2 * l - q;
+//         r = hue2rgb(p, q, h + 1/3);
+//         g = hue2rgb(p, q, h);
+//         b = hue2rgb(p, q, h - 1/3);
+//     }
+//
+//     return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+// }
+
+function utilsRgbToHslAlgorithm(r, g, b) {
+  r /= 255, g /= 255, b /= 255;
+
+  var max = Math.max(r, g, b), min = Math.min(r, g, b);
+  var h, s, l = (max + min) / 2;
+
+  if (max == min) {
+    h = s = 0; // achromatic
+  } else {
+    var d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: h = (b - r) / d + 2; break;
+      case b: h = (r - g) / d + 4; break;
+    }
+
+    h /= 6;
+  }
+
+  return [ h, s, l ];
+}
+
+function utilsRgbToHsl(array) {
+    var conversion = [];
+    for (var i in array) {
+        var r = array[i].split(',')[0].substring(4);
+        var g = array[i].split(',')[1];
+        var b = array[i].split(',')[2].slice(0, -1);
+        var aux = utilsRgbToHslAlgorithm(r, g, b);
+        conversion.push("hsl(" + Math.round(aux[0] * 360) + ", " + Math.round(aux[1] * 100) + "%, " + Math.round(aux[2] * 100) + "%)");
+    }
+
+    return conversion;
+}
+
+function sortColors(object) {
+    var array = [];
+    for (var i in object) {
+        array.push(object[i].hsl);
+    }
+
+    return array.sort().reverse(); // Clears to darkers
+}
+
+// --- Compare user sorting to result
 function checkResult() {
     var user_sort = [];
     $('.color-container').children().each(function() {
         user_sort.push($(this).attr('class'));
     });
-    return user_sort;
-}
+    user_sort = utilsRgbToHsl(user_sort);
+    user_sort = utilsRemoveDuplicates(user_sort);
+    console.log("User");
+    console.log(user_sort);
+    console.log("Game");
+    console.log(game.sortedColors);
 
-// --- Instance of object
-var game = new Game();
+    var winner = true;
+    for (var i = 0; i < game.sortedColors.length -1; i++) {
+        if (user_sort[i] !== game.sortedColors[i]) {
+            winner = false;
+        }
+    }
+
+    console.log(winner);
+}
 
 // --- Build landing page
 function buildLanding() {
+    $('.game-container').remove(); // Reset
     var welcome_container = $('<div class="welcome-container"></div>');
     var html = `
-        <div class="brand">
-            <h1>Colorify</h1>
+        <canvas id="canvas-background"></canvas>
+        <div class="main">
+            <h1 class="brand">Colorify</h1>
+            <div class="level-buttons">
+                <button class="level-one">Level 1</button>
+                <button class="level-two">Level 2</button>
+                <button class="level-three">Level 3</button>
+            </div>
         </div>
-        <div class="level-buttons">
-            <button class="level-one">Level 1</button>
-            <button class="level-two">Level 2</button>
-            <button class="level-three">Level 3</button>
-        </div>
+        <footer>
+            <h3>Clara Ameller</h3>
+            <p>How it's done</p>
+        </footer>
     `;
-    $('.container').append(welcome_container);
     welcome_container.html(html);
+    $('.container').append(welcome_container);
+    // $('.container').append(gradient);
+
+    // --- Canvas gradient background
+    var granimInstance = new Granim({
+        element: '#canvas-background',
+        name: 'background-animation',
+        direction: 'left-right',
+        opacity: [1, 1],
+        stateTransitionSpeed: 5000,
+        isPausedWhenNotInView: true,
+        states : {
+          "default-state": {
+              gradients: [
+                  ['#ff9966', '#ff5e62'],
+                  ['#ff5e62', '#ff9966']
+              ]
+          },
+        },
+    });
 
     // --- Click on level button
     $('.level-buttons button').on('click', function() {
-        buildGamingScreen("Level 1");
+        buildGamingScreen("Level 1", false);
     });
 }
 
 // --- Build gaming screen
-function buildGamingScreen(level) {
+function buildGamingScreen(level, reset) {
+    // --- Instance of object
+    var game = new Game();
+
+    // --- Build screen
     $('.welcome-container').remove(); // Reset
     var game_container = $('<div class="game-container"></div>');
-    $(game_container).html('<div id="colors-left"></div><div id="colors-board"></div>');
+    $(game_container).html(`
+        <header  class="font-red"><h3 class="font-red">Colorify</h3><h3>Clara Ameller</h3></header>
+        <canvas id="canvas-game"></canvas>
+        <div id="colors-left"></div>
+        <div id="colors-board"></div>
+        <footer>
+            <div><button class="btn-back">Back</button></div>
+            <div class="count-down"></div>
+            <div>
+                <button class="btn-reset">Reset</button>
+                <button class="btn-next">Next</button>
+            </div>
+        </footer>
+    `);
     $('.container').append(game_container);
 
     var colors_left = $('#colors-left');
@@ -86,7 +208,7 @@ function buildGamingScreen(level) {
         var color_container = $('<div class="color-container"></div>');
 
         if (game.colors[i].hsl != game.startingColor) {
-            $(colors_left_container).css('background-color', game.colors[i].hsl);
+            $(colors_left_container).css('background', game.colors[i].hsl);
             colors_left.append(colors_left_container);
             board.append(color_container);
         }
@@ -104,26 +226,45 @@ function buildGamingScreen(level) {
         });
     }
 
-    board.append($('<div class="color-container"></div>').css('background-color', game.startingColor));
+    board.append($('<div class="color-container"></div>').css('background', game.startingColor));
     $('.game-container').show(); // Reset
 
+    // --- Count down
+    var clock = $('.count-down').FlipClock({
+        clockFace: 'MinuteCounter',
+        countDown: true
+    });
+
+    // --- Event listeners
+    $('.btn-back').on('click', function() {
+        buildLanding();
+    });
+
+    $('.btn-next').on('click', function() {
+        $('.game-container').remove(); // Reset
+        buildGamingScreen("Level 1", false);
+    });
+
+    $('.btn-reset').on('click', function() {
+        // buildGamingScreen("Level 1", true);
+        clock.stop();
+        clock.reset();
+        clock.start();
+    });
 }
+
+
 
 // --- Drag & drop
 function handleDropEvent(event, ui) {
     var draggable = ui.draggable;
     var bg_color = draggable.css('backgroundColor');
-    var aux = $('<div class="' + bg_color + '"></div>').css({'background-color': 'bg_color', 'display': 'none'});
+    var aux = $('<div class="' + bg_color + '"></div>').css({'background': 'bg_color', 'display': 'none'});
     aux.appendTo($(this));
 
-    if ($('.color-container').has('div').length === 10) {
-        // if (game.result) {
-        //     console.log("Winner");
-        // } else {
-        //     console.log("Loser");
-        // }
-
-        console.log(checkResult());
+    if ($('.color-container').has('div').length === 10) { // All colors completed
+        console.log("completed");
+        checkResult();
     }
 
     // $(this).css('border', '5px solid yellow');

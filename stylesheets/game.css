@@ -19,16 +19,17 @@ body, .container, .welcome-container, .game-container {
 html, body, .container, .welcome-container, .game-container {
     width: 100%;
     height: 100%;
+    margin: 0;
 }
 
-/*#canvas-background {
+#canvas-background, #canvas-game {
     position: absolute;
     top: 0;
     left 0;
     width: 100%;
     height: 100%;
     z-index: -1;
-}*/
+}
 
 /*.welcome-container, .game-container {
     width: 100%;
@@ -39,11 +40,22 @@ html, body, .container, .welcome-container, .game-container {
 
 /* Welcome */
 
-.welcome-container {
+.main {
     display: flex;
     flex-direction: row-reverse;
-    background-size: 200%;
-    background-image: linear-gradient(to bottom left, #fe87c3 0%, #828dfe 50%, #6d58f3 100%);
+}
+
+.welcome-container {
+    /*background-image: url('../background.jpg');*/
+    z-index: -10;
+    /*background-repeat: repeat-y;
+    background-position: 100% 0;*/
+    background-size: cover;
+    /*background-size: 200%;*/
+    /*display: flex;
+    flex-direction: row-reverse;*/
+    /*background-size: 200%;
+    background-image: linear-gradient(to bottom left, #fe87c3 0%, #828dfe 50%, #6d58f3 100%);*/
     transition: 600ms ease;
     /*width: 100%;
     height: 100%;
@@ -55,15 +67,28 @@ html, body, .container, .welcome-container, .game-container {
     background-image: linear-gradient(to bottom left, #fe87c3 0%, #828dfe 50%, #6d58f3 100%);
     transition: 600ms ease;*/
     /*flex-direction: column-reverse;*/
+    /*-webkit-animation-name: MOVE-BG;
+    -webkit-animation-duration: 100s;
+    -webkit-animation-timing-function: linear;
+    -webkit-animation-iteration-count: infinite;*/
 }
 
+/*@-webkit-keyframes MOVE-BG {
+    from {
+        -webkit-transform: translateY(0);
+    }
+    to {
+        -webkit-transform: translateY(-187%);
+    }
+}*/
+
 .welcome-container:hover {
-    background-position: 100% 0;
+    /*background-position: 100% 0;*/
 }
 
 .brand {
     color: white;
-    font-family: 'Kalam';
+    font-family: 'Oswald';
     font-size: 80px;
     margin: 5% 20% auto auto;
 }
@@ -122,18 +147,36 @@ button:hover {
     transition: all .35s;
 }
 
+footer, header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0 30px;
+    font-family: 'Inconsolata';
+    color: white;
+}
+
+header.font-red {
+    color: #FB6A5D;
+}
+
 /* Game */
 
 .game-container {
+    /*background-image: url('../background.jpg');*/
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
     display: none;
-    margin-top: 5%;
+    /*padding-top: 5%;*/
+    z-index: -10;
 }
 
 #colors-left {
     width: 30%;
     height: 200px;
     display: flex;
-    margin: 0 auto;
+    margin: 40px auto;
     display: flex;
     flex-wrap: wrap;
 }
@@ -186,4 +229,21 @@ button:hover {
 
 .ui-draggable-dragging {
     border: 1px solid red;
+}
+
+.flip-clock-wrapper {
+    width: auto;
+    margin: auto;
+}
+
+.flip-clock-wrapper ul {
+    height: 80px;
+}
+
+.flip-clock-wrapper ul li a div div.inn {
+    font-size: 30px;
+}
+
+.flip-clock-label {
+    display: none;
 }

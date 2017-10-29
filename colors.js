@@ -126,3 +126,22 @@
         // $('.colors-continer').disableSelection();
         // $('#colors-left').sortable();
         // $('#colors-left').disableSelection();
+
+        //
+        // for (var i in user_sort) {
+        //     console.log(user_sort[i]);
+        //     var r = user_sort[i].split(',')[0].substring(4);
+        //     var g = user_sort[i].split(',')[1];
+        //     var b = user_sort[i].split(',')[2].slice(0, -1);
+        //     console.log("R: " + r + "G: " + g + "B: " + b);
+        //     console.log(rgbToHsl(r, g, b));
+        // }
+
+
+        // var element = object[i].hsl;
+        // var values = element.split(',');
+        // values[0] = parseInt(values[0].substring(4, values[0].length));
+        // values[1] = parseInt(values[1].slice(0, -1));
+        // values[2] = parseInt(values[2].slice(0, -2));
+        // // console.log(values);
+        // console.log(hslToRgb(values[0], values[1], values[2]));
