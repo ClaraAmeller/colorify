@@ -27,6 +27,39 @@ function Game() {
     }
 }
 
+// --- Methods
+function sortColors(object) {
+    var array = [];
+    for (var i in object) {
+        array.push(object[i].hsl);
+    }
+
+    return array.sort().reverse(); // Clears to darkers
+}
+
+// --- Compare user sorting to result
+function checkResult() {
+    var user_sort = [];
+    $('.color-container').children().each(function() {
+        user_sort.push($(this).attr('class'));
+    });
+    user_sort = utilsRgbToHsl(user_sort);
+    user_sort = utilsRemoveDuplicates(user_sort);
+    console.log("User");
+    console.log(user_sort);
+    console.log("Game");
+    console.log(game.sortedColors);
+
+    var winner = true;
+    for (var i = 0; i < game.sortedColors.length - 1; i++) {
+        if (user_sort[i] !== game.sortedColors[i]) {
+            winner = false;
+        }
+    }
+
+    $('#colors-left').css('background-image', 'url(../confetti.gif)');
+}
+
 // --- Utils
 function utilsRemoveDuplicates(array) {
     array.filter(function(item, index, self) {
@@ -35,31 +68,6 @@ function utilsRemoveDuplicates(array) {
 
     return array;
 }
-
-// function utilsHslToRgbAlgorithm(h, s, l){
-//     var r, g, b;
-//
-//     if(s == 0){
-//         r = g = b = l; // achromatic
-//     }else{
-//         var hue2rgb = function hue2rgb(p, q, t){
-//             if(t < 0) t += 1;
-//             if(t > 1) t -= 1;
-//             if(t < 1/6) return p + (q - p) * 6 * t;
-//             if(t < 1/2) return q;
-//             if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
-//             return p;
-//         }
-//
-//         var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-//         var p = 2 * l - q;
-//         r = hue2rgb(p, q, h + 1/3);
-//         g = hue2rgb(p, q, h);
-//         b = hue2rgb(p, q, h - 1/3);
-//     }
-//
-//     return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
-// }
 
 function utilsRgbToHslAlgorithm(r, g, b) {
     r /= 255, g /= 255, b /= 255;
@@ -103,38 +111,6 @@ function utilsRgbToHsl(array) {
     }
 
     return conversion;
-}
-
-function sortColors(object) {
-    var array = [];
-    for (var i in object) {
-        array.push(object[i].hsl);
-    }
-
-    return array.sort().reverse(); // Clears to darkers
-}
-
-// --- Compare user sorting to result
-function checkResult() {
-    var user_sort = [];
-    $('.color-container').children().each(function() {
-        user_sort.push($(this).attr('class'));
-    });
-    user_sort = utilsRgbToHsl(user_sort);
-    user_sort = utilsRemoveDuplicates(user_sort);
-    console.log("User");
-    console.log(user_sort);
-    console.log("Game");
-    console.log(game.sortedColors);
-
-    var winner = true;
-    for (var i = 0; i < game.sortedColors.length - 1; i++) {
-        if (user_sort[i] !== game.sortedColors[i]) {
-            winner = false;
-        }
-    }
-
-    $('#colors-left').css('background-image', 'url(../confetti.gif)');
 }
 
 // --- Build landing page
@@ -183,8 +159,6 @@ function buildLanding() {
         buildGamingScreen("Level 1", false);
     });
 }
-
-
 
 // --- Build gaming screen
 function buildGamingScreen(level) {
@@ -263,8 +237,6 @@ function buildGamingScreen(level) {
         clock.start();
     });
 }
-
-
 
 // --- Drag & drop
 function handleDropEvent(event, ui) {
