@@ -10,8 +10,6 @@ function Game() {
     this.level = null;
     this.startingTime = 30;
     this.timeRemaining = this.startingTime;
-    this.userSelection = null;
-    this.moves = 0;
 }
 
 var game;
@@ -23,7 +21,7 @@ Game.prototype.generateRandomColors = function() {
     var color;
     for (var i = 0; colors.length < 11; i++) {
         color = {
-            'hsl': 'hsl(' + color_palette + ', 100%, ' + Math.floor(Math.random() * (94 - 25 + 5) + 25) + '%)'
+            'hsl': 'hsl(' + color_palette + ', 100%, ' + Math.floor(Math.random() * (90 - 25 + 2) + 25) + '%)'
         }; // Last parameter: the greater, the clearer
         var found = false;
         for (var j = 0; j < colors.length && !found; j++) {
@@ -54,7 +52,13 @@ Game.prototype.winner = function() {
 
 Game.prototype.loser = function() {
     $('#colors-left').children().remove();
+    clearInterval(game.intervalId);
     $('#colors-left').css('background-image', 'url(../loser.jpg)');
+};
+
+Game.prototype.getLightness = function(color) {
+    var lightness = color.split(',');
+    return lightness[2].slice(0, -1);
 };
 
 // --- Compare user sorting to result
@@ -67,13 +71,14 @@ Game.prototype.checkResult = function() {
     console.log("User");
     console.log(user_sort);
     console.log("Game");
-    console.log(game);
+    console.log(game.sortedColors);
 
     var winner = true;
-    for (var i = 0; i < this.sortedColors.length - 1; i++) {
-        if (user_sort[i] !== this.sortedColors[i]) {
+    for (var i = 0; i < game.sortedColors.length - 1 && winner; i++) {
+        console.log(game.getLightness(user_sort[i]) + "  " + game.getLightness(game.sortedColors[i]));
+        if (game.getLightness(user_sort[i]) != game.getLightness(game.sortedColors[i])) {
+        // if (user_sort[i] != game.sortedColors[i]) {
             winner = false;
-            // $('#colors-left').css('background-image', 'url(../lose.gif)');
         }
     }
     console.log(winner);
@@ -123,6 +128,7 @@ Game.prototype.utilsRgbToHsl = function(array) {
         var b = array[i].split(',')[2].slice(0, -1);
         var aux = game.utilsRgbToHslAlgorithm(r, g, b);
         conversion.push("hsl(" + Math.round(aux[0] * 360) + ", " + Math.round(aux[1] * 100) + "%, " + Math.round(aux[2] * 100) + "%)");
+        console.log(conversion);
     }
 
     return conversion;
@@ -251,12 +257,11 @@ Game.prototype.buildGamingScreen = function(game) {
 
     game.intervalId = setInterval(countDown, 1000);
     function countDown() {
-        var time = clock.getTime().time;
+        // var time = clock.getTime().time;
         game.timeRemaining--;
         if (game.timeRemaining < 0) {
             clearInterval(game.intervalId);
-            game.loser();
-            game.timeRemaining = game.startingTime;
+            game.checkResult();
             return;
         }
     }
@@ -268,6 +273,7 @@ Game.prototype.buildGamingScreen = function(game) {
 
     $('.btn-next').on('click', function() {
         $('.game-container').remove(); // Reset
+        clearInterval(game.intervalId);
         instanceGame();
     });
 
