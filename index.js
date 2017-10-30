@@ -3,65 +3,65 @@
 // --- Object declaration
 function Game() {
     this.state = null;
-    this.colors = generateRandomColors();
-    this.sortedColors = sortColors(this.colors);
+    this.colors = this.generateRandomColors();
+    this.sortedColors = this.sortColors();
     this.startingColor = this.sortedColors[this.sortedColors.length - 1]; // The darkest one
     this.level = null;
     this.startingTime = 5;
     this.timeRemaining = this.startingTime;
     this.userSelection = null;
     this.moves = 0;
-
-    function generateRandomColors() {
-        var colors = [];
-        var color_palette = Math.floor(Math.random() * 359);
-        var color;
-        for (var i = 0; colors.length < 11; i++) {
-            color = {
-                'hsl': 'hsl(' + color_palette + ', 100%, ' + Math.floor(Math.random() * (94 - 25 + 5) + 25) + '%)'
-            }; // Last parameter: the greater, the clearer
-            var found = false;
-            for (var j = 0; j < colors.length && !found; j++) {
-                if(utilsObjectEquals(colors[j], color)) {
-                    found = true;
-                }
-            }
-            if (!found) {
-                colors.push(color);
-            }
-        }
-
-        return colors;
-    }
 }
 
 var game;
 
 // --- Methods
-function sortColors(object) {
+Game.prototype.generateRandomColors = function() {
+    var colors = [];
+    var color_palette = Math.floor(Math.random() * 359);
+    var color;
+    for (var i = 0; colors.length < 11; i++) {
+        color = {
+            'hsl': 'hsl(' + color_palette + ', 100%, ' + Math.floor(Math.random() * (94 - 25 + 5) + 25) + '%)'
+        }; // Last parameter: the greater, the clearer
+        var found = false;
+        for (var j = 0; j < colors.length && !found; j++) {
+            if(this.utilsObjectEquals(colors[j], color)) {
+                found = true;
+            }
+        }
+        if (!found) {
+            colors.push(color);
+        }
+    }
+
+    return colors;
+};
+
+Game.prototype.sortColors = function() {
     var array = [];
-    for (var i in object) {
-        array.push(object[i].hsl);
+    for (var i in this.colors) {
+        array.push(this.colors[i].hsl);
     }
 
     return array.sort().reverse(); // Clears to darkers
-}
+};
 
 // --- Compare user sorting to result
-function checkResult() {
+Game.prototype.checkResult = function() {
     var user_sort = [];
     $('.color-container').children().each(function() {
         user_sort.push($(this).attr('class'));
     });
-    user_sort = utilsRgbToHsl(user_sort);
+    user_sort = game.utilsRgbToHsl(user_sort);
     console.log("User");
     console.log(user_sort);
     console.log("Game");
     console.log(game);
 
     var winner = true;
-    for (var i = 0; i < game.sortedColors.length - 1; i++) {
-        if (user_sort[i] !== game.sortedColors[i]) {
+    for (var i = 0; i < this.sortedColors.length - 1; i++) {
+        if (user_sort[i] !== this.sortedColors[i]) {
             winner = false;
             // $('#colors-left').css('background-image', 'url(../lose.gif)');
         }
@@ -72,14 +72,14 @@ function checkResult() {
     } else {
         alert("sfs");
     }
-}
+};
 
 // --- Utils
-function utilsObjectEquals(obj1, obj2) {
+Game.prototype.utilsObjectEquals = function(obj1, obj2) {
     return obj1.hsl == obj2.hsl;
-}
+};
 
-function utilsRgbToHslAlgorithm(r, g, b) {
+Game.prototype.utilsRgbToHslAlgorithm = function(r, g, b) {
     r /= 255, g /= 255, b /= 255;
     var max = Math.max(r, g, b),
         min = Math.min(r, g, b);
@@ -103,20 +103,20 @@ function utilsRgbToHslAlgorithm(r, g, b) {
         h /= 6;
     }
     return [h, s, l];
-}
+};
 
-function utilsRgbToHsl(array) {
+Game.prototype.utilsRgbToHsl = function(array) {
     var conversion = [];
     for (var i in array) {
         var r = array[i].split(',')[0].substring(4);
         var g = array[i].split(',')[1];
         var b = array[i].split(',')[2].slice(0, -1);
-        var aux = utilsRgbToHslAlgorithm(r, g, b);
+        var aux = game.utilsRgbToHslAlgorithm(r, g, b);
         conversion.push("hsl(" + Math.round(aux[0] * 360) + ", " + Math.round(aux[1] * 100) + "%, " + Math.round(aux[2] * 100) + "%)");
     }
 
     return conversion;
-}
+};
 
 // --- Build landing page
 function buildLanding() {
@@ -161,25 +161,25 @@ function buildLanding() {
 
     // --- Click on level button
     $('.level-buttons button').on('click', function() {
-        createGamingScreen();
+        instanceGame();
     });
 }
 
 // --- Create gaming screen
-function createGamingScreen() {
+function instanceGame() {
     // --- Instance of object
     game = new Game();
-    buildGamingScreen(game);
+    game.buildGamingScreen(game);
 }
 
 // --- Reset gaming screen
-function resetGamingScreen(game) {
+Game.prototype.resetGamingScreen = function(game) {
     $('.game-container').remove(); // Reset
-    buildGamingScreen(game);
-}
+    game.buildGamingScreen(game);
+};
 
 // --- Build gaming screen
-function buildGamingScreen(game) {
+Game.prototype.buildGamingScreen = function(game) {
     // --- Build screen
     $('.welcome-container').remove(); // Reset
     var game_container = $('<div class="game-container"></div>');
@@ -203,12 +203,12 @@ function buildGamingScreen(game) {
     var board = $('#colors-board');
     // game.state = level;
 
-    for (var i = 0; i < game.colors.length; i++) {
+    for (var i = 0; i < this.colors.length; i++) {
         var colors_left_container = $('<div class="colors-left-container"></div>');
         var color_container = $('<div class="color-container"></div>');
 
-        if (game.colors[i].hsl != game.startingColor) {
-            $(colors_left_container).css('background', game.colors[i].hsl);
+        if (this.colors[i].hsl != this.startingColor) {
+            $(colors_left_container).css('background', this.colors[i].hsl);
             colors_left.append(colors_left_container);
             board.append(color_container);
         }
@@ -222,27 +222,27 @@ function buildGamingScreen(game) {
         });
 
         $(color_container).droppable({
-            drop: handleDropEvent,
+            drop: game.handleDropEvent,
         });
     }
 
-    board.append($('<div class="color-container"></div>').css('background', game.startingColor));
+    board.append($('<div class="color-container"></div>').css('background', this.startingColor));
     $('.game-container').show(); // Reset
 
     // --- Count down
-    var clock = $('.count-down').FlipClock(game.startingTime, {
+    var clock = $('.count-down').FlipClock(this.startingTime, {
         countdown: true,
         clockFace: 'MinuteCounter',
     });
 
     var timer = setInterval(countDown, 1000);
-
     function countDown() {
         var time = clock.getTime().time;
         game.timeRemaining--;
+        console.log(game.timeRemaining);
         if (game.timeRemaining < 0) {
             clearInterval(timer);
-            checkResult();
+            game.checkResult();
             return;
         }
     }
@@ -254,19 +254,19 @@ function buildGamingScreen(game) {
 
     $('.btn-next').on('click', function() {
         $('.game-container').remove(); // Reset
-        createGamingScreen();
+        instanceGame();
     });
 
     $('.btn-reset').on('click', function() {
-        resetGamingScreen(game);
+        game.resetGamingScreen(game);
         clock.stop();
         clock.reset();
         clock.start();
     });
-}
+};
 
 // --- Drag & drop
-function handleDropEvent(event, ui) {
+Game.prototype.handleDropEvent = function(event, ui) {
     var draggable = ui.draggable;
     var bg_color = draggable.css('backgroundColor');
     var aux = $('<div class="' + bg_color + '"></div>').css({
@@ -278,12 +278,10 @@ function handleDropEvent(event, ui) {
     console.log(game.timeRemaining);
     if ($('.color-container').has('div').length === 10) { // All colors completed
         console.log("completed");
-        checkResult();
+        game.checkResult();
     }
-
-
     // $(this).css('border', '5px solid yellow');
-}
+};
 
 $(document).ready(function() {
     buildLanding();
