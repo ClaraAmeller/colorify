@@ -6,8 +6,9 @@ function Game() {
     this.colors = this.generateRandomColors();
     this.sortedColors = this.sortColors();
     this.startingColor = this.sortedColors[this.sortedColors.length - 1]; // The darkest one
+    this.intervalId;
     this.level = null;
-    this.startingTime = 5;
+    this.startingTime = 30;
     this.timeRemaining = this.startingTime;
     this.userSelection = null;
     this.moves = 0;
@@ -47,6 +48,15 @@ Game.prototype.sortColors = function() {
     return array.sort().reverse(); // Clears to darkers
 };
 
+Game.prototype.winner = function() {
+    $('#colors-left').css('background-image', 'url(../confetti.gif)');
+};
+
+Game.prototype.loser = function() {
+    $('#colors-left').children().remove();
+    $('#colors-left').css('background-image', 'url(../loser.jpg)');
+};
+
 // --- Compare user sorting to result
 Game.prototype.checkResult = function() {
     var user_sort = [];
@@ -68,9 +78,9 @@ Game.prototype.checkResult = function() {
     }
     console.log(winner);
     if (winner) {
-        $('#colors-left').css('background-image', 'url(../confetti.gif)');
+        game.winner();
     } else {
-        alert("sfs");
+        game.loser();
     }
 };
 
@@ -175,6 +185,7 @@ function instanceGame() {
 // --- Reset gaming screen
 Game.prototype.resetGamingScreen = function(game) {
     $('.game-container').remove(); // Reset
+    clearInterval(game.intervalId);
     game.buildGamingScreen(game);
 };
 
@@ -189,7 +200,7 @@ Game.prototype.buildGamingScreen = function(game) {
         <div id="colors-left"></div>
         <div id="colors-board"></div>
         <footer>
-            <div><button class="btn-back">Back</button></div>
+            <div><button class="btn-back">Home</button></div>
             <div class="count-down"></div>
             <div>
                 <button class="btn-reset">Reset</button>
@@ -230,19 +241,22 @@ Game.prototype.buildGamingScreen = function(game) {
     $('.game-container').show(); // Reset
 
     // --- Count down
+    this.timeRemaining = this.startingTime;
+
+    console.log(game.timeRemaining);
     var clock = $('.count-down').FlipClock(this.startingTime, {
         countdown: true,
         clockFace: 'MinuteCounter',
     });
 
-    var timer = setInterval(countDown, 1000);
+    game.intervalId = setInterval(countDown, 1000);
     function countDown() {
         var time = clock.getTime().time;
         game.timeRemaining--;
-        console.log(game.timeRemaining);
         if (game.timeRemaining < 0) {
-            clearInterval(timer);
-            game.checkResult();
+            clearInterval(game.intervalId);
+            game.loser();
+            game.timeRemaining = game.startingTime;
             return;
         }
     }
@@ -260,7 +274,7 @@ Game.prototype.buildGamingScreen = function(game) {
     $('.btn-reset').on('click', function() {
         game.resetGamingScreen(game);
         clock.stop();
-        clock.reset();
+        // clock.reset();
         clock.start();
     });
 };
@@ -275,7 +289,6 @@ Game.prototype.handleDropEvent = function(event, ui) {
     });
     aux.appendTo($(this));
 
-    console.log(game.timeRemaining);
     if ($('.color-container').has('div').length === 10) { // All colors completed
         console.log("completed");
         game.checkResult();
