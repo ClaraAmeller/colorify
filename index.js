@@ -10,6 +10,8 @@ function Game() {
     this.level = null;
     this.startingTime = 30;
     this.timeRemaining = this.startingTime;
+    this.clock;
+    this.win = null;
 }
 
 var game;
@@ -47,12 +49,16 @@ Game.prototype.sortColors = function() {
 };
 
 Game.prototype.winner = function() {
+    game.clock.stop();
+    game.win = true;
     $('#colors-left').css('background-image', 'url(../confetti.gif)');
 };
 
 Game.prototype.loser = function() {
     $('#colors-left').children().remove();
     clearInterval(game.intervalId);
+    game.clock.stop();
+    game.win = false;
     $('#colors-left').css('background-image', 'url(../loser.jpg)');
 };
 
@@ -65,19 +71,16 @@ Game.prototype.getLightness = function(color) {
 Game.prototype.checkResult = function() {
     var user_sort = [];
     $('.color-container').children().each(function() {
-        user_sort.push($(this).attr('class'));
+        // user_sort.push($(this).attr('class'));
+        user_sort.push($(this).css('backgroundColor'));
     });
     user_sort = game.utilsRgbToHsl(user_sort);
-    console.log("User");
     console.log(user_sort);
-    console.log("Game");
     console.log(game.sortedColors);
 
     var winner = true;
-    for (var i = 0; i < game.sortedColors.length - 1 && winner; i++) {
-        console.log(game.getLightness(user_sort[i]) + "  " + game.getLightness(game.sortedColors[i]));
+    for (var i = 0; i < game.sortedColors.length - 1; i++) {
         if (game.getLightness(user_sort[i]) != game.getLightness(game.sortedColors[i])) {
-        // if (user_sort[i] != game.sortedColors[i]) {
             winner = false;
         }
     }
@@ -128,7 +131,6 @@ Game.prototype.utilsRgbToHsl = function(array) {
         var b = array[i].split(',')[2].slice(0, -1);
         var aux = game.utilsRgbToHslAlgorithm(r, g, b);
         conversion.push("hsl(" + Math.round(aux[0] * 360) + ", " + Math.round(aux[1] * 100) + "%, " + Math.round(aux[2] * 100) + "%)");
-        console.log(conversion);
     }
 
     return conversion;
@@ -230,18 +232,24 @@ Game.prototype.buildGamingScreen = function(game) {
             board.append(color_container);
         }
 
-        $(colors_left_container).draggable({
-            cursor: 'move',
-            snap: '#colors-board .color-container',
-            // containment: '#colors-board',
-            // drag: hangleDragStart,
-            // stop: handleDragStop
-        });
+        // $(colors_left_container).draggable({
+        //     cursor: 'move',
+        //     // snap: '#colors-board .color-container',
+        //     // connectToSortable: '.color-container',
+        //     revert: 'invalid',
+        // });
 
-        $(color_container).droppable({
-            drop: game.handleDropEvent,
-        });
+        // $(color_container).droppable({
+        //     drop: game.handleDropEvent,
+        // });
     }
+
+    $('.color-container, #colors-left').sortable({
+        connectWith: '.color-container',
+        receive: game.handleDrop
+    }).disableSelection();
+    // $( "#colors-board" ).disableSelection();
+
 
     board.append($('<div class="color-container"></div>').css('background', this.startingColor));
     $('.game-container').show(); // Reset
@@ -249,19 +257,19 @@ Game.prototype.buildGamingScreen = function(game) {
     // --- Count down
     this.timeRemaining = this.startingTime;
 
-    console.log(game.timeRemaining);
-    var clock = $('.count-down').FlipClock(this.startingTime, {
+    this.clock = $('.count-down').FlipClock(this.startingTime, {
         countdown: true,
         clockFace: 'MinuteCounter',
     });
 
     game.intervalId = setInterval(countDown, 1000);
     function countDown() {
-        // var time = clock.getTime().time;
         game.timeRemaining--;
         if (game.timeRemaining < 0) {
             clearInterval(game.intervalId);
-            game.checkResult();
+            if (!game.win) {
+                game.loser();
+            }
             return;
         }
     }
@@ -279,27 +287,28 @@ Game.prototype.buildGamingScreen = function(game) {
 
     $('.btn-reset').on('click', function() {
         game.resetGamingScreen(game);
-        clock.stop();
-        // clock.reset();
-        clock.start();
+        game.clock.stop();
+        game.clock.start();
     });
 };
 
 // --- Drag & drop
-Game.prototype.handleDropEvent = function(event, ui) {
-    var draggable = ui.draggable;
-    var bg_color = draggable.css('backgroundColor');
-    var aux = $('<div class="' + bg_color + '"></div>').css({
-        'background': 'bg_color',
-        'display': 'none'
-    });
-    aux.appendTo($(this));
+// Game.prototype.handleDropEvent = function(event, ui) {
+Game.prototype.handleDrop = function() {
+    // alert("handleDrop");
+    // `draggable`
+    // ui.item.addClass(ui.item.css('backgroundColor'));
+    // var bg_color = draggable.css('backgroundColor');
+    // var aux = $('<div class="' + bg_color + '"></div>').css({
+    //     'background': 'bg_color',
+    //     'display': 'none'
+    // });
+    // aux.appendTo($(this));
 
     if ($('.color-container').has('div').length === 10) { // All colors completed
         console.log("completed");
         game.checkResult();
     }
-    // $(this).css('border', '5px solid yellow');
 };
 
 $(document).ready(function() {

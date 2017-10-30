@@ -79,7 +79,7 @@ button:hover {
     cursor: pointer;
 }
 
-.level-one {
+/*.level-one {
     background-color: transparent;
     border: 1px solid #FB6A5D;
     transition: all .1s ease-in-out;
@@ -93,14 +93,13 @@ button:hover {
     margin-bottom: 20px;
     padding: 15px 30px;
     border: none;
-    /*border-radius: 300px;*/
     font-size: 18px;
     font-weight: 700;
     text-transform: uppercase;
     color: white;
     background-color: #FB6A5D;
     transition: all .35s;
-}
+}*/
 
 footer, header {
     display: flex;
@@ -146,10 +145,15 @@ header.font-red {
     margin: 100px auto;
 }
 
+.color-container .colors-left-container {
+    margin: 0;
+}
+
 .color-container, .colors-left-container {
     display: flex;
     border-radius: 5px;
     width: 89px;
+    min-width: 89px;
     height: 80px;
 }
 
