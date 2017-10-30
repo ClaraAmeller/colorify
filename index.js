@@ -7,7 +7,8 @@ function Game() {
     this.sortedColors = sortColors(this.colors);
     this.startingColor = this.sortedColors[this.sortedColors.length - 1]; // The darkest one
     this.level = null;
-    this.timeRemaining = null;
+    this.startingTime = 5;
+    this.timeRemaining = this.startingTime;
     this.userSelection = null;
     this.moves = 0;
 
@@ -15,14 +16,13 @@ function Game() {
         var colors = [];
         var color_palette = Math.floor(Math.random() * 359);
         var color;
-        for (var i = 0; colors.length < 11; i++) { // CHANGE: While colors.length < 11
+        for (var i = 0; colors.length < 11; i++) {
             color = {
-                'hsl': 'hsl(' + color_palette + ', 100%, ' + Math.floor(Math.random() * (95 - 25 + 7) + 25) + '%)'
+                'hsl': 'hsl(' + color_palette + ', 100%, ' + Math.floor(Math.random() * (94 - 25 + 5) + 25) + '%)'
             }; // Last parameter: the greater, the clearer
-
             var found = false;
             for (var j = 0; j < colors.length && !found; j++) {
-                if(objectEquals(colors[j], color)) {
+                if(utilsObjectEquals(colors[j], color)) {
                     found = true;
                 }
             }
@@ -30,13 +30,9 @@ function Game() {
                 colors.push(color);
             }
         }
-        console.log(colors);
+
         return colors;
     }
-}
-
-function objectEquals(obj1, obj2) {
-    return obj1.hsl == obj2.hsl;
 }
 
 var game;
@@ -67,23 +63,20 @@ function checkResult() {
     for (var i = 0; i < game.sortedColors.length - 1; i++) {
         if (user_sort[i] !== game.sortedColors[i]) {
             winner = false;
+            // $('#colors-left').css('background-image', 'url(../lose.gif)');
         }
     }
-
+    console.log(winner);
     if (winner) {
         $('#colors-left').css('background-image', 'url(../confetti.gif)');
     } else {
-        @// TODO: loser gif
+        alert("sfs");
     }
 }
 
 // --- Utils
-function utilsRemoveDuplicates(array) {
-    array.filter(function(item, index, self) {
-        return self.indexOf(item) == index;
-    });
-
-    return array;
+function utilsObjectEquals(obj1, obj2) {
+    return obj1.hsl == obj2.hsl;
 }
 
 function utilsRgbToHslAlgorithm(r, g, b) {
@@ -177,7 +170,6 @@ function createGamingScreen() {
     // --- Instance of object
     game = new Game();
     buildGamingScreen(game);
-
 }
 
 // --- Reset gaming screen
@@ -238,10 +230,22 @@ function buildGamingScreen(game) {
     $('.game-container').show(); // Reset
 
     // --- Count down
-    var clock = $('.count-down').FlipClock({
+    var clock = $('.count-down').FlipClock(game.startingTime, {
+        countdown: true,
         clockFace: 'MinuteCounter',
-        countDown: true
     });
+
+    var timer = setInterval(countDown, 1000);
+
+    function countDown() {
+        var time = clock.getTime().time;
+        game.timeRemaining--;
+        if (game.timeRemaining < 0) {
+            clearInterval(timer);
+            checkResult();
+            return;
+        }
+    }
 
     // --- Event listeners
     $('.btn-back').on('click', function() {
@@ -259,7 +263,6 @@ function buildGamingScreen(game) {
         clock.reset();
         clock.start();
     });
-
 }
 
 // --- Drag & drop
@@ -272,10 +275,12 @@ function handleDropEvent(event, ui) {
     });
     aux.appendTo($(this));
 
+    console.log(game.timeRemaining);
     if ($('.color-container').has('div').length === 10) { // All colors completed
         console.log("completed");
         checkResult();
     }
+
 
     // $(this).css('border', '5px solid yellow');
 }

@@ -145,3 +145,11 @@
         // values[2] = parseInt(values[2].slice(0, -2));
         // // console.log(values);
         // console.log(hslToRgb(values[0], values[1], values[2]));
+
+        // function utilsRemoveDuplicates(array) {
+        //     array.filter(function(item, index, self) {
+        //         return self.indexOf(item) == index;
+        //     });
+        //
+        //     return array;
+        // }
