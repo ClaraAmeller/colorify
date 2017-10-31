@@ -1,39 +1,59 @@
 'use strict';
 
 // --- Object declaration
-function Game() {
-    this.state = null;
+function Game(level) {
+    // this.state = null;
+    this.level = level;
     this.colors = this.generateRandomColors();
     this.sortedColors = this.sortColors();
     this.startingColor = this.sortedColors[this.sortedColors.length - 1]; // The darkest one
     this.intervalId;
-    this.level = null;
     this.startingTime = 30;
     this.timeRemaining = this.startingTime;
     this.clock;
     this.win = null;
+    this.plays = 10;
 }
 
 var game;
 
 // --- Methods
 Game.prototype.generateRandomColors = function() {
-    var colors = [];
+    var colors = [], color, found;
     var color_palette = Math.floor(Math.random() * 359);
-    var color;
-    for (var i = 0; colors.length < 11; i++) {
-        color = {
-            'hsl': 'hsl(' + color_palette + ', 100%, ' + Math.floor(Math.random() * (90 - 25 + 2) + 25) + '%)'
-        }; // Last parameter: the greater, the clearer
-        var found = false;
-        for (var j = 0; j < colors.length && !found; j++) {
-            if(this.utilsObjectEquals(colors[j], color)) {
-                found = true;
+
+    if (this.level === "1") { // Changing only the lightness of the same hue and with 100% saturation
+        for (var i = 0; colors.length < 11; i++) {
+            color = {
+                'hsl': 'hsl(' + color_palette + ', 100%, ' + Math.floor(Math.random() * (90 - 25 + 2) + 25) + '%)'
+            };
+            found = false;
+            for (var j = 0; j < colors.length && !found; j++) {
+                if(this.utilsObjectEquals(colors[j], color)) {
+                    found = true;
+                }
+            }
+            if (!found) {
+                colors.push(color);
             }
         }
-        if (!found) {
-            colors.push(color);
+    } else if (this.level === "2") { // Changing only the lightness of the same hue and with 50% saturation
+        for (var k = 0; colors.length < 11; k++) {
+            color = {
+                'hsl': 'hsl(' + color_palette + ', ' +  Math.floor(Math.random() * (90 - 10 + 5) + 10) + '%, ' + '50%)'
+            };
+            found = false;
+            for (var l = 0; l < colors.length && !found; l++) {
+                if(this.utilsObjectEquals(colors[l], color)) {
+                    found = true;
+                }
+            }
+            if (!found) {
+                colors.push(color);
+            }
         }
+    } else {
+        console.log("3");
     }
 
     return colors;
@@ -44,7 +64,7 @@ Game.prototype.sortColors = function() {
     for (var i in this.colors) {
         array.push(this.colors[i].hsl);
     }
-
+    console.log(array.sort().reverse());
     return array.sort().reverse(); // Clears to darkers
 };
 
@@ -62,25 +82,28 @@ Game.prototype.loser = function() {
     $('#colors-left').css('background-image', 'url(../loser.jpg)');
 };
 
-Game.prototype.getLightness = function(color) {
+Game.prototype.getParam = function(color, level) {
     var lightness = color.split(',');
-    return lightness[2].slice(0, -1);
-};
+    return lightness[level -1].slice(0, -1);
+}; // No more needed
 
 // --- Compare user sorting to result
 Game.prototype.checkResult = function() {
     var user_sort = [];
     $('.color-container').children().each(function() {
-        // user_sort.push($(this).attr('class'));
         user_sort.push($(this).css('backgroundColor'));
     });
     user_sort = game.utilsRgbToHsl(user_sort);
+    console.log("user");
     console.log(user_sort);
-    console.log(game.sortedColors);
+    var aux = user_sort.slice().sort().reverse();
+    console.log("aux");
+    console.log(aux);
 
     var winner = true;
-    for (var i = 0; i < game.sortedColors.length - 1; i++) {
-        if (game.getLightness(user_sort[i]) != game.getLightness(game.sortedColors[i])) {
+    for (var i = 0; i < aux.length - 1; i++) {
+        // if (user_sort[i] != aux[i]) { Better use this one
+        if (game.getParam(user_sort[i], this.level) != game.getParam(aux[i], this.level)) {
             winner = false;
         }
     }
@@ -121,6 +144,41 @@ Game.prototype.utilsRgbToHslAlgorithm = function(r, g, b) {
         h /= 6;
     }
     return [h, s, l];
+    // var r1 = r / 255;
+    // var g1 = g / 255;
+    // var b1 = b / 255;
+    //
+    // var maxColor = Math.max(r1,g1,b1);
+    // var minColor = Math.min(r1,g1,b1);
+    // //Calculate L:
+    // var L = (maxColor + minColor) / 2 ;
+    // var S = 0;
+    // var H = 0;
+    // if(maxColor != minColor){
+    //     //Calculate S:
+    //     if(L < 0.5){
+    //         S = (maxColor - minColor) / (maxColor + minColor);
+    //     }else{
+    //         S = (maxColor - minColor) / (2.0 - maxColor - minColor);
+    //     }
+    //     //Calculate H:
+    //     if(r1 == maxColor){
+    //         H = (g1-b1) / (maxColor - minColor);
+    //     }else if(g1 == maxColor){
+    //         H = 2.0 + (b1 - r1) / (maxColor - minColor);
+    //     }else{
+    //         H = 4.0 + (r1 - g1) / (maxColor - minColor);
+    //     }
+    // }
+    //
+    // L = L * 100;
+    // S = S * 100;
+    // H = H * 60;
+    // if(H<0){
+    //     H += 360;
+    // }
+    // var result = [H, S, L];
+    // return result;
 };
 
 Game.prototype.utilsRgbToHsl = function(array) {
@@ -145,9 +203,9 @@ function buildLanding() {
         <div class="main">
             <h1 class="brand">Colorify</h1>
             <div class="level-buttons">
-                <button class="level-one">Level 1</button>
-                <button class="level-two">Level 2</button>
-                <button class="level-three">Level 3</button>
+                <button class="level-one" name="1">Level 1</button>
+                <button class="level-two" name="2">Level 2</button>
+                <button class="level-three" name="3">Level 3</button>
             </div>
         </div>
         <footer>
@@ -157,7 +215,6 @@ function buildLanding() {
     `;
     welcome_container.html(html);
     $('.container').append(welcome_container);
-    // $('.container').append(gradient);
 
     // --- Canvas gradient background
     var granimInstance = new Granim({
@@ -179,14 +236,18 @@ function buildLanding() {
 
     // --- Click on level button
     $('.level-buttons button').on('click', function() {
-        instanceGame();
+        var level = $(this).attr('name');
+        instanceGame(level);
     });
 }
 
 // --- Create gaming screen
-function instanceGame() {
+function instanceGame(level) {
     // --- Instance of object
-    game = new Game();
+    if (level === undefined) {
+        level = game.level;
+    }
+    game = new Game(level);
     game.buildGamingScreen(game);
 }
 
@@ -220,7 +281,6 @@ Game.prototype.buildGamingScreen = function(game) {
 
     var colors_left = $('#colors-left');
     var board = $('#colors-board');
-    // game.state = level;
 
     for (var i = 0; i < this.colors.length; i++) {
         var colors_left_container = $('<div class="colors-left-container"></div>');
@@ -231,30 +291,22 @@ Game.prototype.buildGamingScreen = function(game) {
             colors_left.append(colors_left_container);
             board.append(color_container);
         }
-
-        // $(colors_left_container).draggable({
-        //     cursor: 'move',
-        //     // snap: '#colors-board .color-container',
-        //     // connectToSortable: '.color-container',
-        //     revert: 'invalid',
-        // });
-
-        // $(color_container).droppable({
-        //     drop: game.handleDropEvent,
-        // });
     }
+
+    console.log("Fixed: " + this.startingColor);
 
     $('.color-container, #colors-left').sortable({
         connectWith: '.color-container',
         receive: game.handleDrop
     }).disableSelection();
-    // $( "#colors-board" ).disableSelection();
-
 
     board.append($('<div class="color-container"></div>').css('background', this.startingColor));
     $('.game-container').show(); // Reset
 
     // --- Count down
+    if (this.level === "2") {
+        this.startingTime = 60;
+    }
     this.timeRemaining = this.startingTime;
 
     this.clock = $('.count-down').FlipClock(this.startingTime, {
@@ -293,7 +345,6 @@ Game.prototype.buildGamingScreen = function(game) {
 };
 
 // --- Drag & drop
-// Game.prototype.handleDropEvent = function(event, ui) {
 Game.prototype.handleDrop = function() {
     // alert("handleDrop");
     // `draggable`
@@ -304,8 +355,7 @@ Game.prototype.handleDrop = function() {
     //     'display': 'none'
     // });
     // aux.appendTo($(this));
-
-    if ($('.color-container').has('div').length === 10) { // All colors completed
+    if ($('.color-container').has('div').length === game.plays) { // All colors completed
         console.log("completed");
         game.checkResult();
     }
