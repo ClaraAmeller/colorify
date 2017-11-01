@@ -54,6 +54,20 @@ Game.prototype.generateRandomColors = function() {
         }
     } else {
         console.log("3");
+        for (var n = 0; colors.length < 11; n++) {
+            color = {
+                'hsl': 'hsl(' + Math.floor(Math.random() * (360 - 100) + 100) + ', 100%, 50%)'
+            };
+            found = false;
+            for (var a = 0; a < colors.length && !found; a++) {
+                if(this.utilsObjectEquals(colors[a], color)) {
+                    found = true;
+                }
+            }
+            if (!found) {
+                colors.push(color);
+            }
+        }
     }
 
     return colors;
@@ -102,8 +116,8 @@ Game.prototype.checkResult = function() {
 
     var winner = true;
     for (var i = 0; i < aux.length - 1; i++) {
-        // if (user_sort[i] != aux[i]) { Better use this one
-        if (game.getParam(user_sort[i], this.level) != game.getParam(aux[i], this.level)) {
+        if (user_sort[i] != aux[i]) {
+        // if (user_sort[i], this.level) != game.getParam(aux[i], this.level)) {
             winner = false;
         }
     }
@@ -144,41 +158,6 @@ Game.prototype.utilsRgbToHslAlgorithm = function(r, g, b) {
         h /= 6;
     }
     return [h, s, l];
-    // var r1 = r / 255;
-    // var g1 = g / 255;
-    // var b1 = b / 255;
-    //
-    // var maxColor = Math.max(r1,g1,b1);
-    // var minColor = Math.min(r1,g1,b1);
-    // //Calculate L:
-    // var L = (maxColor + minColor) / 2 ;
-    // var S = 0;
-    // var H = 0;
-    // if(maxColor != minColor){
-    //     //Calculate S:
-    //     if(L < 0.5){
-    //         S = (maxColor - minColor) / (maxColor + minColor);
-    //     }else{
-    //         S = (maxColor - minColor) / (2.0 - maxColor - minColor);
-    //     }
-    //     //Calculate H:
-    //     if(r1 == maxColor){
-    //         H = (g1-b1) / (maxColor - minColor);
-    //     }else if(g1 == maxColor){
-    //         H = 2.0 + (b1 - r1) / (maxColor - minColor);
-    //     }else{
-    //         H = 4.0 + (r1 - g1) / (maxColor - minColor);
-    //     }
-    // }
-    //
-    // L = L * 100;
-    // S = S * 100;
-    // H = H * 60;
-    // if(H<0){
-    //     H += 360;
-    // }
-    // var result = [H, S, L];
-    // return result;
 };
 
 Game.prototype.utilsRgbToHsl = function(array) {
@@ -305,6 +284,8 @@ Game.prototype.buildGamingScreen = function(game) {
 
     // --- Count down
     if (this.level === "2") {
+        this.startingTime = 45;
+    } else if (this.level === "3") {
         this.startingTime = 60;
     }
     this.timeRemaining = this.startingTime;
