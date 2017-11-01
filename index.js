@@ -93,7 +93,7 @@ Game.prototype.loser = function() {
     clearInterval(game.intervalId);
     game.clock.stop();
     game.win = false;
-    $('#colors-left').css('background-image', 'url(../loser.jpg)');
+    $('#colors-left').css('background-image', 'url(../loser.gif)');
 };
 
 Game.prototype.getParam = function(color, level) {

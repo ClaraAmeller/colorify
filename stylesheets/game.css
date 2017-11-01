@@ -21,10 +21,6 @@ html, body, .container, .welcome-container, .game-container {
     height: 100%;
 }
 
-.container {
-    align-items: center;
-}
-
 #canvas-background, #canvas-game {
     position: absolute;
     top: 0;
@@ -39,7 +35,9 @@ html, body, .container, .welcome-container, .game-container {
 .main {
     display: flex;
     flex-direction: row-reverse;
-    align-self: flex-start;
+    height: 90%;
+    align-items: center;
+    justify-content: center;
 }
 
 .welcome-container {
@@ -52,13 +50,12 @@ html, body, .container, .welcome-container, .game-container {
     color: white;
     font-family: 'Oswald';
     font-size: 190px;
-    margin: 10% 20% auto auto;
+    margin-left: 5%;
 }
 
 .level-buttons {
-    padding: 15% 10%;
+    padding-top: 2rem;
     display: flex;
-    margin-left: auto;
     flex-direction: column;
 }
 
@@ -67,44 +64,27 @@ button {
     text-transform: uppercase;
     margin-bottom: 20px;
     padding: 15px 30px;
-    border: none;
+    border: 1px solid transparent;
     font-size: 18px;
     font-weight: 700;
     text-transform: uppercase;
     color: white;
     background-color: #FB6A5D;
     transition: all .35s;
+    outline: none;
 }
 
 button:hover {
     background-color: transparent;
-    border: 1px solid #FB6A5D;
-    transition: all .1s ease-in-out;
     color: #FB6A5D;
+    border: 2px solid #FB6A5D;
+    transition: all .1s ease-in-out;
     cursor: pointer;
 }
 
-/*.level-one {
-    background-color: transparent;
-    border: 1px solid #FB6A5D;
-    transition: all .1s ease-in-out;
-    color: #FB6A5D;
-    cursor: pointer;
-}
-
-.level-one:hover {
-    width: 150px;
-    text-transform: uppercase;
-    margin-bottom: 20px;
-    padding: 15px 30px;
-    border: none;
-    font-size: 18px;
-    font-weight: 700;
-    text-transform: uppercase;
+.main button:hover {
     color: white;
-    background-color: #FB6A5D;
-    transition: all .35s;
-}*/
+}
 
 footer, header {
     display: flex;
