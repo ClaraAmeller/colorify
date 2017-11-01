@@ -130,6 +130,22 @@ header.font-red {
     margin: 100px auto;
 }
 
+/* prevents the colors inside the board from being displaced when draging a new color into a container that already has a color */
+
+#colors-board .color-container {
+    position: relative;
+}
+
+#colors-board .colors-left-container {
+    position: absolute;
+}
+
+/* prevents colors fom being dragged once they are inside the board */
+
+#colors-board .colors-left-container {
+    pointer-events: none;
+}
+
 .color-container .colors-left-container {
     margin: 0;
 }

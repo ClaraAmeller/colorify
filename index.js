@@ -40,7 +40,7 @@ Game.prototype.generateRandomColors = function() {
     } else if (this.level === "2") { // Changing only the lightness of the same hue and with 50% saturation
         for (var k = 0; colors.length < 11; k++) {
             color = {
-                'hsl': 'hsl(' + color_palette + ', ' +  Math.floor(Math.random() * (90 - 10 + 5) + 10) + '%, ' + '50%)'
+                'hsl': 'hsl(' + color_palette + ', ' +  Math.floor(Math.random() * (90 - 10 + 6) + 10) + '%, ' + '50%)'
             };
             found = false;
             for (var l = 0; l < colors.length && !found; l++) {
@@ -83,45 +83,51 @@ Game.prototype.sortColors = function() {
 };
 
 Game.prototype.winner = function() {
+    // if (!(this instanceof Game)) {
+    //     throw new Error("HERERERE!");
+    // }
+    clearInterval(game.intervalId);
     game.clock.stop();
     game.win = true;
     $('#colors-left').css('background-image', 'url(../confetti.gif)');
 };
 
 Game.prototype.loser = function() {
-    $('#colors-left').children().remove();
+    $('#colors-left').children().remove(); // Remove the colors left to sort (if countdown runs out)
     clearInterval(game.intervalId);
     game.clock.stop();
     game.win = false;
     $('#colors-left').css('background-image', 'url(../loser.gif)');
 };
 
-Game.prototype.getParam = function(color, level) {
-    var lightness = color.split(',');
-    return lightness[level -1].slice(0, -1);
-}; // No more needed
+// Game.prototype.getParam = function(color, level) {
+//     var lightness = color.split(',');
+//     return lightness[level -1].slice(0, -1);
+// }; // No more needed
 
 // --- Compare user sorting to result
 Game.prototype.checkResult = function() {
     var user_sort = [];
+    var winner = true;
+
     $('.color-container').children().each(function() {
         user_sort.push($(this).css('backgroundColor'));
     });
-    user_sort = game.utilsRgbToHsl(user_sort);
-    console.log("user");
+
+    user_sort = game.utilsRgbToHsl(user_sort); // Convert it back to HSL
+    var aux = user_sort.slice().sort().reverse(); // Copy the user_sort and sort it
+
+    console.log("User");
     console.log(user_sort);
-    var aux = user_sort.slice().sort().reverse();
-    console.log("aux");
+    console.log("Aux");
     console.log(aux);
 
-    var winner = true;
     for (var i = 0; i < aux.length - 1; i++) {
-        if (user_sort[i] != aux[i]) {
-        // if (user_sort[i], this.level) != game.getParam(aux[i], this.level)) {
+        if (user_sort[i] != aux[i]) { // If a single combination is not correctly sorted, then user loses
             winner = false;
         }
     }
-    console.log(winner);
+
     if (winner) {
         game.winner();
     } else {
@@ -223,10 +229,10 @@ function buildLanding() {
 // --- Create gaming screen
 function instanceGame(level) {
     // --- Instance of object
-    if (level === undefined) {
-        level = game.level;
+    if (level === undefined) { // Function called from 'Next' button
+        level = game.level; // The level will be the same as previous game
     }
-    game = new Game(level);
+    game = new Game(level); // Function called from Landing page or 'Restart' button
     game.buildGamingScreen(game);
 }
 
@@ -237,9 +243,15 @@ Game.prototype.resetGamingScreen = function(game) {
     game.buildGamingScreen(game);
 };
 
+Game.prototype.detectSolved = function() {
+    if ($('.color-container').has('div').length === game.plays) { // All colors completed
+        console.log("check");
+        this.checkResult();
+    }
+};
+
 // --- Build gaming screen
 Game.prototype.buildGamingScreen = function(game) {
-    // --- Build screen
     $('.welcome-container').remove(); // Reset
     var game_container = $('<div class="game-container"></div>');
     $(game_container).html(`
@@ -262,25 +274,31 @@ Game.prototype.buildGamingScreen = function(game) {
     var board = $('#colors-board');
 
     for (var i = 0; i < this.colors.length; i++) {
-        var colors_left_container = $('<div class="colors-left-container"></div>');
-        var color_container = $('<div class="color-container"></div>');
+        var colors_left_container = $('<div class="colors-left-container"></div>'); // Colors to sort
+        var color_container = $('<div class="color-container"></div>'); // Individual container where they'll be dropped
 
-        if (this.colors[i].hsl != this.startingColor) {
+        if (this.colors[i].hsl != this.startingColor) { // The starting color won't be on "colors to sort"
             $(colors_left_container).css('background', this.colors[i].hsl);
             colors_left.append(colors_left_container);
             board.append(color_container);
         }
     }
 
-    console.log("Fixed: " + this.startingColor);
-
     $('.color-container, #colors-left').sortable({
         connectWith: '.color-container',
-        receive: game.handleDrop
-    }).disableSelection();
+        receive: game.handleDrop,
+        tolerance: "pointer"
+    });
 
-    board.append($('<div class="color-container"></div>').css('background', this.startingColor));
-    $('.game-container').show(); // Reset
+    $('#colors-board').sortable({
+        tolerance: "pointer",
+        receive: game.handleReorder,
+        tolerance: "pointer"
+    });
+
+    board.append($('<div class="color-container"></div>').css('background', this.startingColor)); // Positioning the starting color
+
+    $('.game-container').show();
 
     // --- Count down
     if (this.level === "2") {
@@ -288,6 +306,7 @@ Game.prototype.buildGamingScreen = function(game) {
     } else if (this.level === "3") {
         this.startingTime = 60;
     }
+
     this.timeRemaining = this.startingTime;
 
     this.clock = $('.count-down').FlipClock(this.startingTime, {
@@ -295,7 +314,6 @@ Game.prototype.buildGamingScreen = function(game) {
         clockFace: 'MinuteCounter',
     });
 
-    game.intervalId = setInterval(countDown, 1000);
     function countDown() {
         game.timeRemaining--;
         if (game.timeRemaining < 0) {
@@ -307,6 +325,8 @@ Game.prototype.buildGamingScreen = function(game) {
         }
     }
 
+    game.intervalId = setInterval(countDown, 1000);
+
     // --- Event listeners
     $('.btn-back').on('click', function() {
         buildLanding();
@@ -314,32 +334,29 @@ Game.prototype.buildGamingScreen = function(game) {
 
     $('.btn-next').on('click', function() {
         $('.game-container').remove(); // Reset
-        clearInterval(game.intervalId);
+        clearInterval(game.intervalId); // Reset countdown
         instanceGame();
     });
 
     $('.btn-reset').on('click', function() {
         game.resetGamingScreen(game);
-        game.clock.stop();
+        game.clock.stop(); // Restart countdown
         game.clock.start();
     });
 };
 
 // --- Drag & drop
-Game.prototype.handleDrop = function() {
-    // alert("handleDrop");
-    // `draggable`
-    // ui.item.addClass(ui.item.css('backgroundColor'));
-    // var bg_color = draggable.css('backgroundColor');
-    // var aux = $('<div class="' + bg_color + '"></div>').css({
-    //     'background': 'bg_color',
-    //     'display': 'none'
-    // });
-    // aux.appendTo($(this));
-    if ($('.color-container').has('div').length === game.plays) { // All colors completed
-        console.log("completed");
-        game.checkResult();
+Game.prototype.handleDrop = function(event, ui) {
+    // console.log($(this), $(ui.item));
+    if ($(this).children().length > 1) {
+        ui.sender.sortable("cancel");
     }
+    game.detectSolved();
+
+    // if ($('.color-container').has('div').length === game.plays) { // All colors completed
+    //     console.log("check");
+    //     game.checkResult();
+    // }
 };
 
 $(document).ready(function() {
