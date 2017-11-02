@@ -118,8 +118,12 @@ Game.prototype.checkResult = function() {
     user_sort = this.utilsRgbToHsl(user_sort); // Convert it back to HSL
     if (this.level !== "3") {
         aux = user_sort.slice();
-        aux = this.cutToParam(aux);
-        user_sort = this.cutToParam(user_sort);
+        aux_short = this.cutToParam(aux);
+        aux = aux_short;
+        user_sort_short = this.cutToParam(user_sort);
+        user_sort = user_sort_short;
+        console.log(aux.sort().reverse());
+        console.log(user_sort);
     } else {
         aux = user_sort.slice().sort().reverse(); // Copy the user_sort and sort it
     }
@@ -191,10 +195,10 @@ Game.prototype.utilsRgbToHsl = function(array) {
 };
 
 // --- Get only the param that's changing
-// Game.prototype.utilsGetParam = function(color, level) {
-//     var lightness = color.split(',');
-//     return lightness[level -1].slice(0, -1);
-// };
+Game.prototype.utilsGetParam = function(color, level) {
+    var lightness = color.split(',');
+    return lightness[level -1].slice(0, -1);
+};
 
 // --- Detect if the user has finished the
 Game.prototype.detectFinished = function() {
