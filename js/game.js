@@ -92,26 +92,48 @@ Game.prototype.loser = function() {
     $('#colors-left').css('background-image', 'url(./img/loser.gif)');
 };
 
+Game.prototype.cutToParam = function(array) {
+    var short = [];
+    for (var i in array) {
+        var index = array[i].split(',');
+        index.shift();
+        short.push(index);
+    }
+
+    return short;
+};
+
 // --- Compare user sorting to result
 Game.prototype.checkResult = function() {
-    var user_sort = [];
+    var self = this;
+
+    var user_sort = [], user_sort_short = [];
     var winner = true;
+    var aux, aux_short = [];
 
     $('.color-container').children().each(function() {
         user_sort.push($(this).css('backgroundColor'));
     });
 
     user_sort = this.utilsRgbToHsl(user_sort); // Convert it back to HSL
-    var aux = user_sort.slice().sort().reverse(); // Copy the user_sort and sort it
+    if (this.level !== "3") {
+        aux = user_sort.slice();
+        aux = this.cutToParam(aux);
+        user_sort = this.cutToParam(user_sort);
+    } else {
+        aux = user_sort.slice().sort().reverse(); // Copy the user_sort and sort it
+    }
 
     console.log("User");
     console.log(user_sort);
     console.log("Aux");
     console.log(aux);
 
-    for (var i = 0; i < aux.length - 1; i++) {
-        if (this.utilsGetParam(user_sort[i], this.level) != this.utilsGetParam(aux[i], this.level)) { // If a single combination is not correctly sorted, then user loses
+    for (var i = 0; i < aux.length; i++) {
+        console.log(typeof(user_sort[i].toString()) + " " + typeof(aux[i].toString()));
+        if (user_sort[i].toString() != aux[i].toString()) { // If a single combination is not correctly sorted, then user loses
             winner = false;
+            console.log("false");
         }
     }
 
@@ -169,10 +191,10 @@ Game.prototype.utilsRgbToHsl = function(array) {
 };
 
 // --- Get only the param that's changing
-Game.prototype.utilsGetParam = function(color, level) {
-    var lightness = color.split(',');
-    return lightness[level -1].slice(0, -1);
-};
+// Game.prototype.utilsGetParam = function(color, level) {
+//     var lightness = color.split(',');
+//     return lightness[level -1].slice(0, -1);
+// };
 
 // --- Detect if the user has finished the
 Game.prototype.detectFinished = function() {

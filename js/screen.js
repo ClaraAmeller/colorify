@@ -61,6 +61,7 @@ Screen.prototype.createGame = function(level) {
         this.game.level = level;
         this.game.colors = this.game.generateRandomColors();
         this.game.sortedColors = this.game.sortColors();
+        console.log(this.game.sortedColors);
         this.game.startingColor = this.game.sortedColors[this.game.sortedColors.length - 1]; // The darkest one
         this.game.plays = 10;
         this.game.startingTime = 30;
