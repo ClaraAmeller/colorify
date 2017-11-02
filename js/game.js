@@ -81,7 +81,7 @@ Game.prototype.winner = function() {
     clearInterval(this.intervalId);
     this.clock.stop();
     this.win = true;
-    $('#colors-left').css('background-image', 'url(./img/winner.gif)');
+    $('#colors-left').css({'background-image': 'url(./img/winner.gif)', 'background-repeat': 'no-repeat'});
 };
 
 Game.prototype.loser = function() {
@@ -89,7 +89,7 @@ Game.prototype.loser = function() {
     clearInterval(this.intervalId);
     this.clock.stop();
     this.win = false;
-    $('#colors-left').css('background-image', 'url(./img/loser.gif)');
+    $('#colors-left').css({'background-image': 'url(./img/loser.gif)', 'background-repeat': 'no-repeat'});
 };
 
 Game.prototype.cutToParam = function(array) {
