@@ -95,8 +95,82 @@ footer, header {
     color: white;
 }
 
+footer a {
+    text-decoration: none;
+    color: white;
+}
+
 header.font-red {
     color: #FB6A5D;
+}
+
+/* Instructions modal */
+
+#modal-instructions {
+    font-family: 'Inconsolata';
+}
+
+#modal-instructions h3 {
+    color: #FB6A5D;
+}
+
+#modal-instructions p {
+    color: grey;
+}
+
+#modal-instructions i {
+    font-size: 13px;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: transparent;
+}
+
+.modal-content {
+    background-color: rgba(255, 255, 255, .9);
+    margin: 5% auto;
+    padding: 20px 40px;
+    /*border: 1px solid #FB6A5D;*/
+    border-radius: 5px;
+    width: 70%;
+}
+
+.modal-header h2 {
+    margin-top: 5px;
+}
+
+.modal-header .flex {
+    display: flex;
+    justify-content: space-between;
+}
+
+.modal-header p {
+    margin-top: 0;
+}
+
+.modal-header {
+    margin-bottom: 32px;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover, .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
 }
 
 /* Game */

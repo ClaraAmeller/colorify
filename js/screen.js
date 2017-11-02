@@ -22,7 +22,7 @@ Screen.prototype.buildLanding = function() {
         </div>
         <footer>
             <h3>Clara Ameller</h3>
-            <p>How it's done</p>
+            <a class="instructions" href="#"><h3>How it works</h3></a>
         </footer>
     `;
     welcome_container.html(html);
@@ -51,6 +51,46 @@ Screen.prototype.buildLanding = function() {
         var level = $(this).attr('name');
         self.createGame(level);
     });
+
+    // --- Click on `How it works` link
+    $('.instructions').click(function(e) {
+        e.stopPropagation();
+        self.buildInstructionsModal();
+        $('#modal-instructions').show();
+
+        $(document).click(function() {
+            $('#modal-instructions').hide();
+        });
+    });
+};
+
+Screen.prototype.buildInstructionsModal = function() {
+    var modal = `
+        <div id="modal-instructions" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="flex">
+                        <h3>How it works</h3>
+                        <h3>It's a game about sorting colors</h3>
+                    </div>
+                    <p>Drag and drop the randomized colors to sort them</p>
+                </div>
+                <div class="modal-body">
+                    <h3><i class="fa fa-paint-brush" aria-hidden="true"></i> Level 1</h3>
+                    <p>Same color palette. It's all about sorting the colors by\
+                    lightness, so darkers to lighters.<br /><br />You have 30 seconds!</p>
+                    <h3><i class="fa fa-paint-brush" aria-hidden="true"></i> Level 2</h3>
+                    <p>Same color palette. It's all about sorting the colors by\
+                    saturation, so muted to brighter.<br /><br />You have 45 seconds!</p>
+                    <h3><i class="fa fa-paint-brush" aria-hidden="true"></i> Level 3</h3>
+                    <p>Different color palette. It's all about sorting the colors by\
+                    hue, so 'rainbowy'.<br /><br />You have an entire minute!</p>
+                </div>
+            </div>
+        </div>
+    `;
+
+    $('.main').append(modal);
 };
 
 // --- Create game set up
@@ -61,7 +101,6 @@ Screen.prototype.createGame = function(level) {
         this.game.level = level;
         this.game.colors = this.game.generateRandomColors();
         this.game.sortedColors = this.game.sortColors();
-        console.log(this.game.sortedColors);
         this.game.startingColor = this.game.sortedColors[this.game.sortedColors.length - 1]; // The darkest one
         this.game.plays = 10;
         this.game.startingTime = 30;
@@ -75,7 +114,7 @@ Screen.prototype.buildGamingScreen = function() {
     $('.welcome-container').remove(); // Reset
     var game_container = $('<div class="game-container"></div>');
     $(game_container).html(`
-        <header  class="font-red"><h3 class="font-red">Colorify</h3><h3>Clara Ameller</h3></header>
+        <header class="font-red"><h3 class="font-red">Colorify</h3><h3>Clara Ameller</h3></header>
         <canvas id="canvas-game"></canvas>
         <div id="colors-left"></div>
         <div id="colors-board"></div>
