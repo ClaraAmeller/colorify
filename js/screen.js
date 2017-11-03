@@ -187,6 +187,7 @@ Screen.prototype.buildGamingScreen = function() {
 
     // --- Event listeners
     $('.btn-back').on('click', function() {
+        clearInterval(self.game.intervalId); // Reset countdown
         self.buildLanding();
     });
 
@@ -197,6 +198,7 @@ Screen.prototype.buildGamingScreen = function() {
     });
 
     $('.btn-reset').on('click', function() {
+        clearInterval(self.game.intervalId); // Reset countdown
         self.resetGamingScreen();
         self.game.clock.stop(); // Restart countdown
         self.game.clock.start();
