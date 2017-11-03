@@ -115,9 +115,10 @@ Screen.prototype.buildGamingScreen = function() {
     var game_container = $('<div class="game-container"></div>');
     $(game_container).html(`
         <header class="font-red"><h3 class="font-red">Colorify</h3><h3>Clara Ameller</h3></header>
-        <canvas id="canvas-game"></canvas>
-        <div id="colors-left"></div>
-        <div id="colors-board"></div>
+        <div class="game">
+            <div id="colors-left"></div>
+            <div id="colors-board"></div>
+        </div>
         <footer>
             <div><button class="btn-back">Home</button></div>
             <div class="count-down"></div>

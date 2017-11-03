@@ -240,6 +240,12 @@ header.font-red {
     border: 1px solid red;
 }
 
+.game-container footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+}
+
 /* Countdown */
 
 .flip-clock-wrapper {
